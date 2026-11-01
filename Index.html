@@ -1,0 +1,568 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#064e3b">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#064e3b">
+<meta name="description" content="XCHANGE AFRICA - Exchange Without Borders. Convert international currencies with ease.">
+<title>XCHANGE AFRICA</title>
+
+<style>
+:root {
+  --green: #064e3b;
+  --dark: #032e24;
+  --gold: #d6ad50;
+  --white: #ffffff;
+  --bg: #f3f7f5;
+  --text: #18352c;
+  --muted: #708078;
+  --border: #e1eae5;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+header {
+  background: var(--green);
+  color: white;
+  padding: 18px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand { font-size: 22px; font-weight: 800; letter-spacing: 1px; }
+.brand span { color: var(--gold); }
+.tagline { font-size: 11px; color: #e4d3a6; margin-top: 4px; }
+.status { font-size: 12px; color: #d9f4e4; }
+nav {
+  background: var(--dark);
+  display: flex;
+  gap: 8px;
+  padding: 10px 5%;
+  overflow-x: auto;
+}
+nav button {
+  color: white;
+  background: transparent;
+  border: 0;
+  padding: 10px 13px;
+  border-radius: 7px;
+}
+nav button.active, nav button:hover {
+  background: var(--gold);
+  color: var(--dark);
+}
+main { max-width: 1050px; margin: auto; padding: 24px 16px 50px; }
+.hero {
+  background: linear-gradient(120deg, var(--green), #087451);
+  color: white;
+  padding: 28px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+.hero h1 { margin: 0 0 10px; font-size: 27px; }
+.hero p { margin: 0; color: #e0eee7; line-height: 1.5; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 19px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.035);
+}
+.card h3 { margin: 0 0 12px; font-size: 15px; }
+.metric { font-size: 25px; font-weight: 800; color: var(--green); }
+.small { font-size: 12px; color: var(--muted); margin-top: 7px; }
+.section-title { font-size: 20px; margin: 25px 0 14px; }
+.field { margin: 15px 0; }
+label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
+input, select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #d7e2dc;
+  border-radius: 8px;
+  background: white;
+  color: var(--text);
+  outline-color: var(--gold);
+}
+.converter {
+  max-width: 580px;
+  margin: auto;
+}
+.swap {
+  display: block;
+  margin: 12px auto;
+  border: 1px solid var(--gold);
+  color: var(--green);
+  background: #fff9e9;
+  padding: 10px 16px;
+  border-radius: 30px;
+}
+.btn {
+  background: var(--green);
+  color: white;
+  border: 0;
+  padding: 13px 17px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+.btn.gold { background: var(--gold); color: var(--dark); }
+.btn.secondary { background: #e8f1ec; color: var(--green); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.full { width: 100%; }
+.result {
+  margin-top: 18px;
+  background: #edf7f0;
+  padding: 18px;
+  border-radius: 10px;
+  border-left: 4px solid var(--gold);
+}
+.result-value { font-size: 27px; font-weight: 800; color: var(--green); }
+.notice { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); }
+.action { border: 0; background: none; color: var(--green); font-weight: bold; }
+.page { display: none; }
+.page.active { display: block; }
+footer {
+  background: var(--dark);
+  color: white;
+  text-align: center;
+  padding: 25px 15px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.empty { text-align: center; color: var(--muted); padding: 22px; }
+#message { font-size: 13px; margin: 10px 0; }
+@media(min-width:700px) {
+  main { padding-top: 32px; }
+  .hero h1 { font-size: 34px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div>
+    <div class="brand">XCHANGE <span>AFRICA</span></div>
+    <div class="tagline">EXCHANGE WITHOUT BORDERS</div>
+  </div>
+  <div class="status" id="connectionStatus">Checking connection...</div>
+</header>
+
+<nav>
+  <button class="active" data-page="home">Home</button>
+  <button data-page="convert">Convert</button>
+  <button data-page="rates">Live Rates</button>
+  <button data-page="history">History</button>
+  <button data-page="profile">About</button>
+</nav>
+
+<main>
+
+<section id="home" class="page active">
+  <div class="hero">
+    <h1>Exchange Without Borders.</h1>
+    <p>Explore international currencies and convert money with XCHANGE AFRICA.</p>
+    <br>
+    <button class="btn gold" onclick="showPage('convert')">Start Converting</button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Supported currencies</h3>
+      <div class="metric">15</div>
+      <div class="small">Available in this version</div>
+    </div>
+    <div class="card">
+      <h3>Saved conversions</h3>
+      <div class="metric" id="historyCount">0</div>
+      <div class="small">On this device</div>
+    </div>
+    <div class="card">
+      <h3>Rate service</h3>
+      <div class="metric" id="rateStatus">Waiting</div>
+      <div class="small" id="rateTime">Checking exchange-rate provider</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Welcome to XCHANGE AFRICA</h3>
+    <p class="notice">Our mission is to make international currency information easier to access. Check rates, convert currencies and keep track of your calculations.</p>
+    <button class="btn full" onclick="refreshRates()">Refresh Exchange Rates</button>
+  </div>
+</section>
+
+<section id="convert" class="page">
+  <div class="converter card">
+    <h2>Currency Converter</h2>
+    <p class="notice">Enter an amount and select the currencies you want to convert.</p>
+
+    <div class="field">
+      <label for="amount">Amount</label>
+      <input id="amount" type="number" min="0" step="any" placeholder="Enter amount" value="100">
+    </div>
+
+    <div class="field">
+      <label for="fromCurrency">From currency</label>
+      <select id="fromCurrency"></select>
+    </div>
+
+    <button class="swap" onclick="swapCurrencies()">⇅ Swap currencies</button>
+
+    <div class="field">
+      <label for="toCurrency">To currency</label>
+      <select id="toCurrency"></select>
+    </div>
+
+    <button class="btn full" onclick="convertCurrency()">Convert Currency</button>
+    <div id="conversionResult"></div>
+    <div id="message"></div>
+    <p class="notice">Rates are indicative reference rates, not guaranteed payment or transfer quotes. Provider fees and exchange margins may apply.</p>
+  </div>
+</section>
+
+<section id="rates" class="page">
+  <div class="card">
+    <h2>Exchange Rates</h2>
+    <p class="notice">Reference rates against Nigerian Naira (NGN).</p>
+    <button class="btn" onclick="refreshRates()">↻ Refresh Rates</button>
+    <p id="lastUpdated" class="small">Rates have not loaded yet.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Currency</th><th>Value in NGN</th></tr></thead>
+        <tbody id="ratesTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="history" class="page">
+  <div class="card">
+    <h2>Conversion History</h2>
+    <p class="notice">Your recent calculations saved on this device.</p>
+    <button class="btn secondary" onclick="clearHistory()">Clear History</button>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Conversion</th><th>Result</th></tr></thead>
+        <tbody id="historyTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="profile" class="page">
+  <div class="card">
+    <h2>About XCHANGE AFRICA</h2>
+    <h3>Our vision</h3>
+    <p>To make currency information and international financial services more accessible through technology.</p>
+    <h3>Our slogan</h3>
+    <p><strong>Exchange Without Borders.</strong></p>
+    <h3>Contact and support</h3>
+    <p class="notice">Official customer support contact details will be added before public launch.</p>
+    <h3>Important information</h3>
+    <p class="notice">This version provides currency conversion information only. It does not hold funds, provide wallets, or send and receive money. Do not submit passwords, bank details or payment information here.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <strong>XCHANGE AFRICA</strong><br>
+  Exchange Without Borders.<br>
+  Currency information and conversion services.<br>
+  © <span id="year"></span> XCHANGE AFRICA
+</footer>
+
+<script>
+"use strict";
+
+const currencies = {
+  NGN: "Nigerian Naira",
+  GHS: "Ghanaian Cedi",
+  USD: "US Dollar",
+  GBP: "British Pound",
+  EUR: "Euro",
+  CAD: "Canadian Dollar",
+  KES: "Kenyan Shilling",
+  ZAR: "South African Rand",
+  GMD: "Gambian Dalasi",
+  XOF: "West African CFA Franc",
+  XAF: "Central African CFA Franc",
+  AUD: "Australian Dollar",
+  INR: "Indian Rupee",
+  AED: "UAE Dirham",
+  SAR: "Saudi Riyal"
+};
+
+let rates = null;
+let updatedAt = null;
+let history = loadSavedHistory();
+
+function loadSavedHistory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("xa_history") || "[]");
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory() {
+  try {
+    localStorage.setItem("xa_history", JSON.stringify(history.slice(0, 50)));
+  } catch {
+    showMessage("Unable to save history on this device.");
+  }
+}
+
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(el => {
+    el.classList.toggle("active", el.id === page);
+  });
+
+  document.querySelectorAll("nav button").forEach(button => {
+    button.classList.toggle("active", button.dataset.page === page);
+  });
+
+  if (page === "history") renderHistory();
+  if (page === "rates") renderRates();
+
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => showPage(button.dataset.page));
+});
+
+function fillCurrencyOptions() {
+  const from = document.getElementById("fromCurrency");
+  const to = document.getElementById("toCurrency");
+
+  Object.entries(currencies).forEach(([code, name]) => {
+    const label = `${code} - ${name}`;
+    from.add(new Option(label, code));
+    to.add(new Option(label, code));
+  });
+
+  from.value = "GHS";
+  to.value = "NGN";
+}
+
+function showMessage(message, error = false) {
+  const element = document.getElementById("message");
+  if (!element) return;
+  element.textContent = message;
+  element.style.color = error ? "#b42318" : "#087451";
+}
+
+async function refreshRates() {
+  const status = document.getElementById("connectionStatus");
+  const rateStatus = document.getElementById("rateStatus");
+
+  status.textContent = "Updating rates...";
+  rateStatus.textContent = "Loading";
+
+  try {
+    const response = await fetch(
+      "https://open.er-api.com/v6/latest/NGN",
+      {cache: "no-store"}
+    );
+
+    if (!response.ok) throw new Error("Rate service unavailable.");
+
+    const data = await response.json();
+
+    if (data.result !== "success" || !data.rates || !data.rates.USD) {
+      throw new Error("The provider returned invalid rate data.");
+    }
+
+    rates = data.rates;
+    updatedAt = data.time_last_update_utc || new Date().toISOString();
+
+    status.textContent = "Rate service connected";
+    rateStatus.textContent = "Available";
+
+    document.getElementById("rateTime").textContent =
+      "Provider update received";
+
+    document.getElementById("lastUpdated").textContent =
+      "Provider last updated: " + updatedAt;
+
+    renderRates();
+
+    showMessage("Exchange rates successfully updated.");
+  } catch (error) {
+    status.textContent = "Rate service unavailable";
+    rateStatus.textContent = "Unavailable";
+
+    document.getElementById("rateTime").textContent =
+      "Check your internet connection.";
+
+    showMessage(
+      "Could not retrieve live rates. Please try again later.",
+      true
+    );
+  }
+}
+
+function convertCurrency() {
+  if (!rates) {
+    showMessage("Live rates are not available. Refresh rates and try again.", true);
+    return;
+  }
+
+  const amount = Number(document.getElementById("amount").value);
+  const from = document.getElementById("fromCurrency").value;
+  const to = document.getElementById("toCurrency").value;
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    showMessage("Please enter an amount greater than zero.", true);
+    return;
+  }
+
+  if (!rates[from] || !rates[to]) {
+    showMessage("The selected currency is not supported by the rate provider.", true);
+    return;
+  }
+
+  // Rates are quoted as units of foreign currency per 1 NGN.
+  const result = (amount / rates[from]) * rates[to];
+
+  if (!Number.isFinite(result)) {
+    showMessage("Unable to calculate this conversion.", true);
+    return;
+  }
+
+  const formatted = new Intl.NumberFormat("en", {
+    maximumFractionDigits: 2
+  }).format(result);
+
+  document.getElementById("conversionResult").innerHTML = `
+    <div class="result">
+      <div class="small">Estimated converted amount</div>
+      <div class="result-value">${formatted} ${to}</div>
+      <p class="notice">1 ${from} = ${formatNumber((1 / rates[from]) * rates[to])} ${to}</p>
+      <p class="notice">Rate reference: ${escapeHTML(updatedAt || "Latest available provider data")}</p>
+      <p class="notice">This is an indicative calculation, not a guaranteed transaction quote.</p>
+    </div>
+  `;
+
+  history.unshift({
+    date: new Date().toLocaleString(),
+    amount,
+    from,
+    to,
+    result
+  });
+
+  history = history.slice(0, 50);
+  saveHistory();
+  updateDashboard();
+  renderHistory();
+
+  showMessage("Conversion completed and saved.");
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat("en", {
+    maximumFractionDigits: 4
+  }).format(value);
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+
+function swapCurrencies() {
+  const from = document.getElementById("fromCurrency");
+  const to = document.getElementById("toCurrency");
+  const previous = from.value;
+  from.value = to.value;
+  to.value = previous;
+  convertCurrency();
+}
+
+function renderRates() {
+  const body = document.getElementById("ratesTable");
+
+  if (!rates) {
+    body.innerHTML = `<tr><td colspan="2">Live rates are not currently available.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = Object.keys(currencies).map(code => {
+    if (!rates[code]) return "";
+
+    const nairaValue = 1 / rates[code];
+
+    return `<tr>
+      <td>${code} - ${currencies[code]}</td>
+      <td>₦${formatNumber(nairaValue)}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderHistory() {
+  const body = document.getElementById("historyTable");
+
+  if (!history.length) {
+    body.innerHTML = `<tr><td colspan="3" class="empty">No conversions saved yet.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = history.map(item => `
+    <tr>
+      <td>${escapeHTML(item.date)}</td>
+      <td>${formatNumber(item.amount)} ${escapeHTML(item.from)} → ${escapeHTML(item.to)}</td>
+      <td>${formatNumber(item.result)} ${escapeHTML(item.to)}</td>
+    </tr>
+  `).join("");
+}
+
+function clearHistory() {
+  if (!confirm("Are you sure you want to clear your conversion history?")) return;
+
+  history = [];
+  saveHistory();
+  renderHistory();
+  updateDashboard();
+}
+
+function updateDashboard() {
+  document.getElementById("historyCount").textContent = history.length;
+}
+
+document.getElementById("year").textContent = new Date().getFullYear();
+
+fillCurrencyOptions();
+renderHistory();
+updateDashboard();
+refreshRates();
+</script>
+
+</body>
+</html>
